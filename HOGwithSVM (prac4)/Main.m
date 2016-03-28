@@ -1,5 +1,5 @@
-clear all;
-
+%clear all;
+%[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
 %showHog rsize = [160,96] !!!!
 
 %Declare variables for storing image locations
@@ -21,7 +21,7 @@ pedestrianTrainLabelsneg = [];
 for i=3:nfiles
     currentfilename = imagefilespos(i).name;
     currentimage = imread(currentfilename);
-    if size(I,3)>1
+    if size(currentimage,3)>1
         currentimage = rgb2gray(currentimage);
     end
     currentimage = currentimage(:)';
@@ -36,7 +36,7 @@ nfiles = length(imagefilesneg);
 for i=3:nfiles
     currentfilename = imagefilesneg(i).name;
     currentimage = imread(currentfilename);
-    if size(I,3)>1
+    if size(currentimage,3)>1
         currentimage = rgb2gray(currentimage);
     end
     currentimage = currentimage(:)';
@@ -49,22 +49,24 @@ pedestrianTrainImages = cat(1,pedestrianTrainImages,pedestrianTrainImagesneg);
 pedestrianTrainLabels = cat(2,pedestrianTrainLabels,pedestrianTrainLabelsneg);
 
 %Write previous arrays to new training arrays 
-imwrite(pedestrianTrainImages, trainImages);
-imwrite(pedestrianTrainLabels, trainLabels);
+trainImages = pedestrianTrainImages;
+trainLabels = pedestrianTrainLabels;
 
 %Set training array size
-numTrainImages = size(pedestrianTrainImages, 1);
+numTrainImages = size(trainImages, 1);
 
 %Load pedestrian db 
-[testimages, testlabels] = loadPedestrianDatabase('pedestrian_train.cdataset');
+%[testimages, testlabels] = loadPedestrianDatabase('pedestrian_train.cdataset');
 
 %Calculate all Hogs for test images 
-hogMatrix = calcAllHogs(testimages);
+hogMatrix = calcAllHogs(trainImages);
 
 %DisplayHog
-%for i = 1 :numTrainImages
-%   showHog(hogMatrix(i, :), [160, 96]);
-%end
+numTrainImages
+for i = 1 :numTrainImages
+    i
+   showHog(hogMatrix(i, :), [160, 96]);
+end
 
 
 %Create training model 
