@@ -10,6 +10,8 @@ and draw rectangle on best estimated window
 
 topLeftRow = 1;
 topLeftCol = 1;
+
+%Used for setting the rate in which the box traverses the picture
 xStep = 30;
 yStep = 60;
 
@@ -27,7 +29,7 @@ for y = topLeftCol:yStep:bottomRightCol-wSize(2)
         featureVector{fcount} = HOG(double(img));
         boxPoint{fcount} = [x,y];
         fcount = fcount+1;
-        %x = x+1;
+        %x = x+1; Doesnt do anything
     end
 end
 
