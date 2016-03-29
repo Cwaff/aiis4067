@@ -1,5 +1,5 @@
 %clear all;
-%[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
 %showHog rsize = [160,96] !!!!
 
 %Declare variables for storing image locations
@@ -55,37 +55,58 @@ trainLabels = pedestrianTrainLabels;
 %Set training array size
 numTrainImages = size(trainImages, 1);
 
-%Load pedestrian db 
-%[testimages, testlabels] = loadPedestrianDatabase('pedestrian_train.cdataset');
-
-%Calculate all Hogs for test images 
-hogMatrix = calcAllHogs(trainImages);
-
-%DisplayHog
-numTrainImages
 for i = 1 :numTrainImages
-    i
-   showHog(hogMatrix(i, :), [160, 96]);
+    featureImage = reshape(trainImages(i, :), [160, 96]);
+    hogFeatures(i, :) = hog_feature_vector(featureImage);
 end
 
+showHog(hogFeatures(i, :), [160, 96]);
 
-%Create training model 
-svmModel = SVMTraining(hogMatrix, testlabels);
+model = SVMTraining(hogFeatures, trainLabels);
 
-%Load Pedestrian Testing dataset 
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
 
-%Set test array size
 numTestImages = size(pedestrianTestImages, 1);
-
 
 for i = 1 :numTestImages
     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
-    hogMatrix(i, :) = hog_feature_vector(featureImage);
-    [prediction(i, 1) maxi] = SVMTesting_v2(hogFeatures, model);
+    hogFeatures(i, :) = hog_feature_vector(featureImage);
+    [prediction(i, 1), maxi] = SVMTesting(hogFeatures, model);
 end
 
-comparison = (pedestrianTestLabels == prediction);
+comparison = (pedestrianTestLabels == prediction)
 
-accuracy = sum(comparison)/length(comparison);
+accuracy = sum(comparison)/length(comparison)
 
+% %Load pedestrian db 
+% %[testimages, testlabels] = loadPedestrianDatabase('pedestrian_train.cdataset');
+% 
+% %Calculate all Hogs for test images 
+% %hogMatrix = calcAllHogs(trainImages);
+% 
+% %DisplayHog
+% % for i = 1 :numTrainImages
+% %    showHog(hogMatrix(i, :), [160, 96]);
+% % end
+% 
+% 
+% %Create training model 
+% svmModel = SVMTraining(hogMatrix, testlabels);
+% 
+% %Load Pedestrian Testing dataset 
+% [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
+% 
+% %Set test array size
+% numTestImages = size(pedestrianTestImages, 1);
+% 
+% 
+% for i = 1 :numTestImages
+%     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
+%     hogMatrix(i, :) = hog_feature_vector(featureImage);
+%     [prediction(i, 1) maxi] = SVMTesting(hogFeatures, model);
+% end
+% 
+% comparison = (pedestrianTestLabels == prediction);
+% 
+% accuracy = sum(comparison)/length(comparison);
+% 
