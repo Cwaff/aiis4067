@@ -1,8 +1,10 @@
-%clear all;
+clear all; 
+%
 [pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
 %showHog rsize = [160,96] !!!!
 
 %Declare variables for storing image locations
+
 filepath = 'images\pos\';
 filepathneg = 'images\neg\';
 imagefilespos = dir('images\pos');
@@ -26,7 +28,7 @@ for i=3:nfiles
     end
     currentimage = currentimage(:)';
     pedestrianTrainImages(i-2,:) = currentimage(1,:);
-    pedestrianTrainLabels(i-2) = 1;
+    pedestrianTrainLabels(i-2,1) = 1;
 end
 
 %Assign negative images to correct row of images matrix array
@@ -41,13 +43,13 @@ for i=3:nfiles
     end
     currentimage = currentimage(:)';
     pedestrianTrainImagesneg(i-2,:) = currentimage(1,:);
-    pedestrianTrainLabelsneg(i-2) = -1;
+    pedestrianTrainLabelsneg(i-2,1) = -1;
 end
 
 %Concatenate positive and negatives into 1 array 
 pedestrianTrainImages = cat(1,pedestrianTrainImages,pedestrianTrainImagesneg);
-pedestrianTrainLabels = cat(2,pedestrianTrainLabels,pedestrianTrainLabelsneg);
-
+pedestrianTrainLabels = cat(1,pedestrianTrainLabels,pedestrianTrainLabelsneg);
+%}
 %Write previous arrays to new training arrays 
 trainImages = pedestrianTrainImages;
 trainLabels = pedestrianTrainLabels;
@@ -55,26 +57,29 @@ trainLabels = pedestrianTrainLabels;
 %Set training array size
 numTrainImages = size(trainImages, 1);
 
+%i=1;
 for i = 1 :numTrainImages
     featureImage = reshape(trainImages(i, :), [160, 96]);
     hogFeatures(i, :) = hog_feature_vector(featureImage);
 end
 
-showHog(hogFeatures(i, :), [160, 96]);
+%showHog(hogFeatures(i, :), [160, 96]);
 
-model = SVMTraining(hogFeatures, trainLabels);
+%model = SVMtraining_1(hogFeatures, trainLabels);
+model = SVMtraining_1(trainImages,trainLabels);
 
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
 
-numTestImages = size(pedestrianTestImages, 1);
+numTestImages = size(pedestrianTestImages)
+numTestImages = size(pedestrianTestImages,1)
 
 for i = 1 :numTestImages
-    featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
-    hogFeatures(i, :) = hog_feature_vector(featureImage);
-    [prediction(i, 1), maxi] = SVMTesting(hogFeatures, model);
+    %featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
+    %hogFeatures(i, :) = hog_feature_vector(featureImage);
+    [prediction(i, 1), maxi] = SVMTesting(pedestrianTestImages(i,:), model);
 end
 
-comparison = (pedestrianTestLabels == prediction)
+comparison = (pedestrianTestLabels == prediction);
 
 accuracy = sum(comparison)/length(comparison)
 

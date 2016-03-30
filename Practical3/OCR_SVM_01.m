@@ -11,15 +11,15 @@ addpath .\SVM-KM\
 %done by using the variable sampling>1
 sampling=10;
 images = loadMNISTImages('train-images',sampling);
-labels = loadMNISTLabels('train-labels',sampling);
+trainlabels = loadMNISTLabels('train-labels',sampling);
 
 %In this scrpit we want to deat with a binary classification problem.
 %Therefore we selec only those images corresponding to 0 or 1
-indexesZeros = find (labels == 0);
-indexesOnes = find (labels == 1);
+indexesZeros = find (trainlabels == 0);
+indexesOnes = find (trainlabels == 1);
 
 images= [images(indexesZeros,:); images(indexesOnes,:)];
-labels= [labels(indexesZeros); labels(indexesOnes)];
+trainlabels= [trainlabels(indexesZeros); trainlabels(indexesOnes)];
 
 % For visualization purposes, we display the first 100 images
 figure
@@ -32,7 +32,7 @@ for i=1:100
     %To visualise or recompose the image again, we need to revert that
     %process in its 28x28 image format
     Im = reshape(images(i,:),28,28);
-    subplot(10,10,i), imshow(Im), title(['label: ',num2str(labels(i))])
+    subplot(10,10,i), imshow(Im), title(['label: ',num2str(trainlabels(i))])
     
 end
 
@@ -48,14 +48,14 @@ X_reduce=(images-ones(size(images,1),1)*imean)*U(:,1:3);
 figure, hold on
 colours= ['r.'; 'g.'; 'b.'; 'k.'; 'y.'; 'c.'; 'm.'; 'r+'; 'g+'; 'b+'; 'k+'; 'y+'; 'c+'; 'm+'];
 count=0;
-for i=min(labels):max(labels)
+for i=min(trainlabels):max(trainlabels)
     count = count+1;
-    indexes = find (labels == i);
+    indexes = find (trainlabels == i);
     plot3(X_reduce(indexes,1),X_reduce(indexes,2),X_reduce(indexes,3),colours(count,:))
 end
 
 %Perform training
-modelSVM = SVMtraining(images, labels);
+modelSVM = SVMtraining(images, trainlabels);
 
 %After calculating the support vectors, we can draw them in the previous
 %image
@@ -75,12 +75,12 @@ set(h,'lineWidth',5)
 % It is very important that this images are different from the ones used in
 % training or our results will not be reliable
 images = loadMNISTImages('test-images',sampling);
-labels = loadMNISTLabels('test-labels',sampling);
-indexesZeros = find (labels == 0);
-indexesOnes = find (labels == 1);
+testlabels = loadMNISTLabels('test-labels',sampling);
+indexesZeros = find (testlabels == 0);
+indexesOnes = find (testlabels == 1);
 
 images= [images(indexesZeros,:); images(indexesOnes,:)];
-labels= [labels(indexesZeros); labels(indexesOnes)];
+testlabels= [testlabels(indexesZeros); testlabels(indexesOnes)];
 
 
 for i=1:size(images,1)
@@ -96,7 +96,7 @@ end
 
 % Finally we compared the predicted classification from our mahcine
 % learning algorithm against the real labelling of the esting image
-comparison = (labels==classificationResult);
+comparison = (testlabels==classificationResult);
 
 %Accuracy is the most common metric. It is defiend as the numebr of
 %correctly classified samples/ the total number of tested samples

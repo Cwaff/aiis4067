@@ -1,6 +1,8 @@
 clear all
 close all
 
+addpath .\PCA_&_EigenFaces\
+
 %% training Stage
 
 % Loading labels and examples of handwritten digits from MNIST Dataset
@@ -26,8 +28,11 @@ for i=1:100
     
 end
 
+[U,S,X_Mean,Xpca] = PrincipalComponentAnalysis(images);
+
 %Supervised training function that takes the examples and infers a model
-modelNN = NNtraining(images, labels);
+modelNN = NNtraining(Xpca,labels);
+%modelNN = NNtraining(images, labels);
 
 
 % It is difficult for humans to visualise the full space of digits, since they have more than 700 dimension.
@@ -35,7 +40,7 @@ modelNN = NNtraining(images, labels);
 % the problem, i.e. how close or far away are the different classes, we can
 % apply dimenisonality reduction (we will see this in our last lectures), which will give us the most relevant
 % dimension to observe
-[U,S,X_reduce] = pca(images,3);
+%[U,S,X_reduce] = pca(images,3);
 
 figure, hold on
 colours= ['r.'; 'g.'; 'b.'; 'k.'; 'y.'; 'c.'; 'm.'; 'r+'; 'g+'; 'b+'; 'k+'; 'y+'; 'c+'; 'm+'];
@@ -43,7 +48,7 @@ count=0;
 for i=min(labels):max(labels)
     count = count+1;
     indexes = find (labels == i);
-    plot3(X_reduce(indexes,1),X_reduce(indexes,2),X_reduce(indexes,3),colours(count,:))
+    plot3(Xpca(indexes,1),Xpca(indexes,2),Xpca(indexes,3),colours(count,:))
 end
 
 
@@ -59,8 +64,9 @@ labels = loadMNISTLabels('test-labels',sampling);
 for i=1:size(images,1)
     
     testnumber= images(i,:);
-    
-    classificationResult(i,1) = KNNTesting(testnumber, modelNN,3);
+    Xpca=()*
+    classificationResult(i,1) = KNNTesting(xpca,modelNN)
+    %classificationResult(i,1) = KNNTesting(testnumber, modelNN,3);
     
 end
 
