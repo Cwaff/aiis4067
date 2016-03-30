@@ -70,6 +70,7 @@ showHog(hogFeatures(i, :), [160, 96]);
 
 %model = SVMtraining_1(hogFeatures, trainLabels);
 model = SVMtraining_1(trainImages,trainLabels);
+model = NNTraining(trainImages,trainLabels);
 
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
 
