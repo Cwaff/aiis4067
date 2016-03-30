@@ -1,9 +1,9 @@
-%clear all; 
+clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 5);
 %showHog rsize = [160,96] !!!!
-
+%{
 %Declare variables for storing image locations
 
 filepath = 'images\pos\';
@@ -50,7 +50,7 @@ end
 %Concatenate positive and negatives into 1 array 
 pedestrianTrainImages = cat(1,pedestrianTrainImages,pedestrianTrainImagesneg);
 pedestrianTrainLabels = cat(1,pedestrianTrainLabels,pedestrianTrainLabelsneg);
-
+%}
 %Write previous arrays to new training arrays 
 trainImages = pedestrianTrainImages;
 trainLabels = pedestrianTrainLabels;
@@ -71,7 +71,7 @@ showHog(hogFeatures(i, :), [160, 96]);
 %model = SVMtraining_1(hogFeatures, trainLabels);
 model = NNtraining(trainImages,trainLabels);
 
-[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
+[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 5);
 
 numTestImages = size(pedestrianTestImages)
 numTestImages = size(pedestrianTestImages,1)
@@ -80,9 +80,8 @@ for i = 1 :numTestImages
     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
     hogFeatures(i, :) = hog_feature_vector(featureImage);
     %[prediction(i, 1), maxi] = SVMTesting(hogFeatures(i,:), model);
-    [prediction(i, 1)] = KNNTesting(pedestrianTestImages(i, :), model,3);
+    [prediction(i, 1)] = KNNTesting(pedestrianTestImages(i, :), model,2);
 end
-
 comparison = (pedestrianTestLabels == prediction)
 
 accuracy = sum(comparison)/length(comparison)
