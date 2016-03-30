@@ -1,7 +1,7 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 3);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 20);
 %showHog rsize = [160,96] !!!!
 
 %Declare variables for storing image locations
@@ -71,7 +71,7 @@ showHog(hogFeatures(i, :), [160, 96]);
 %model = SVMtraining_1(hogFeatures, trainLabels);
 model = NNtraining(trainImages,trainLabels);
 
-[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 3);
+[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 20);
 
 numTestImages = size(pedestrianTestImages)
 numTestImages = size(pedestrianTestImages,1)
