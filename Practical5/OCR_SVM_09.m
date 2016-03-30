@@ -14,7 +14,7 @@ images = loadMNISTImages('train-images',sampling);
 labels = loadMNISTLabels('train-labels',sampling);
 
 % For visualization purposes, we display the first 100 images
-figure
+figure('name', 'First 100 Images')
 for i=1:100
 
     % As you can notice by the size of the matrix image, each digit image
@@ -93,7 +93,7 @@ Accuracy = sum(comparison)/length(comparison)
 
 
 %We display 100 of the correctly classified images
-figure
+figure('name','Correct Classification')
 title('Correct Classification')
 count=0;
 i=1;
@@ -112,7 +112,7 @@ end
 
 
 %We display 100 of the incorrectly classified images
-figure
+figure('name' 'Wrong Classification')
 title('Wrong Classification')
 count=0;
 i=1;
