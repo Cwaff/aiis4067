@@ -53,5 +53,4 @@ totalim = totalim / scale;
 
 imagesc(totalim), colormap(gray)
 
-
 end

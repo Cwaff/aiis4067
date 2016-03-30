@@ -68,8 +68,8 @@ end
 
 showHog(hogFeatures(i, :), [160, 96]);
 
-%model = SVMtraining_1(hogFeatures, trainLabels);
-model = SVMtraining_1(trainImages,trainLabels);
+model = SVMtraining_1(hogFeatures, trainLabels);
+%model = SVMtraining_1(trainImages,trainLabels);
 
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
 
@@ -80,7 +80,7 @@ for i = 1 :numTestImages
     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
     hogFeatures(i, :) = hog_feature_vector(featureImage);
     %[prediction(i, 1), maxi] = SVMTesting(hogFeatures(i,:), model);
-    [prediction(i, 1), maxi] = SVMTesting(pedestrianTestImages(i, :), model);
+    [prediction(i, 1), maxi] = SVMTesting(testImages(i,:), model);
 end
 
 comparison = (pedestrianTestLabels == prediction)
