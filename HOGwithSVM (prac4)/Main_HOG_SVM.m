@@ -1,7 +1,8 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
+
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 20);
 %{
 %showHog rsize = [160,96] !!!!
 
@@ -68,25 +69,52 @@ for i = 1 :numTrainImages
 end
 
 showHog(hogFeatures(i, :), [160, 96]);
-
+tic
 model = SVMtraining_1(hogFeatures, trainLabels);
+trainingTime = toc;
 %model = NNtraining(trainImages,trainLabels);
 
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
 
 numTestImages = size(pedestrianTestImages)
 numTestImages = size(pedestrianTestImages,1)
-
+tic
 for i = 1 :numTestImages
     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
     hogFeatures(i, :) = hog_feature_vector(featureImage);
     [prediction(i, 1), maxi] = SVMTesting(hogFeatures(i,:), model);
     %[prediction(i, 1)] = NNTesting(pedestrianTestImages(i, :), model);
 end
+testingTime = toc;
 
 comparison = (pedestrianTestLabels == prediction)
 
 accuracy = sum(comparison)/length(comparison)
+
+tp=0;
+tn=0;
+fp=0;
+fn=0;
+for i=1:numTestImages
+    if(and(prediction(i,1) == 1,pedestrianTestLabels(i,1) == 1))
+        tp = tp +1;
+    elseif(and(prediction(i,1) == 1,pedestrianTestLabels(i,1) == -1))
+        fp = fp+1;
+    elseif(and(prediction(i,1) == -1,pedestrianTestLabels(i,1) == -1))
+        tn = tn+1;
+    else
+        fn = fn+1;
+    end
+end
+
+errorRate = (fn+fp)/numTestImages
+sensitivity = tp/(tp+fn)
+precision = tp/(tp+fp)
+specificity = tn/(tn +fp)
+falseAlarm = 1 - specificity
+f1 = (2*tp)/((2*tp) + fn + fp)
+trainingTime
+testingTime
 
 % %Load pedestrian db 
 % %[testimages, testlabels] = loadPedestrianDatabase('pedestrian_train.cdataset');
