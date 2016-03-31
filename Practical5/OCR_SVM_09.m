@@ -33,10 +33,12 @@ end
 % the problem, i.e. how close or far away are the different classes, we can
 % apply dimensionality reduction, which will give us the most relevant
 % dimension to observe
-%{
-[U,S,X_reduce] = pca(images);
+
+%[U,S,X_reduce] = pca(images);
+[eigenVectors,eigenvalues,meanX,x_pca] = PrincipalComponentAnalysis(images);
+%[eigenVectors,eigenvalues,meanX,x_LDA] = LDA(labels,[],images);
 imean=mean(images,1);
-X_reduce=(images-ones(size(images,1),1)*imean)*U(:,1:3);
+%X_reduce=(images-ones(size(images,1),1)*imean)*U(:,1:3);
 
 figure, hold on
 colours= ['r.'; 'g.'; 'b.'; 'k.'; 'y.'; 'c.'; 'm.'; 'r+'; 'g+'; 'b+'; 'k+'; 'y+'; 'c+'; 'm+'];
@@ -44,11 +46,12 @@ count=0;
 for i=min(labels):max(labels)
     count = count+1;
     indexes = find (labels == i);
-    plot3(X_reduce(indexes,1),X_reduce(indexes,2),X_reduce(indexes,3),colours(count,:))
+    plot3(x_pca(indexes,1),x_pca(indexes,2),x_pca(indexes,3),colours(count,:))
 end
 %}
 %Perform training
-[eigenVectors,eigenvalues,meanX,x_pca] = PrincipalComponentAnalysis(images);
+%[eigenVectors,eigenvalues,meanX,x_pca] = PrincipalComponentAnalysis(images);
+
 %modelSVM = SVMtraining(images, labels);
 modelSVM = SVMtraining(x_pca, labels);
 
@@ -75,8 +78,8 @@ labels = loadMNISTLabels('test-labels',sampling);
 for i=1:size(images,1)
     
     testnumber= images(i,:);
-    test_xpca = (testnumber - meanX) * eigenVectors;
-    classificationResult(i,1) = SVMTesting(test_xpca,modelSVM);
+    test_xlda = (testnumber - meanX) * eigenVectors;
+    classificationResult(i,1) = SVMTesting(test_xlda,modelSVM);
 
 end
 
@@ -112,7 +115,7 @@ end
 
 
 %We display 100 of the incorrectly classified images
-figure('name' 'Wrong Classification')
+figure('name' ,'Wrong Classification')
 title('Wrong Classification')
 count=0;
 i=1;
