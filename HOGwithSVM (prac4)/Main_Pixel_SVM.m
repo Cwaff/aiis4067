@@ -1,7 +1,7 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 5);
 %{
 %showHog rsize = [160,96] !!!!
 

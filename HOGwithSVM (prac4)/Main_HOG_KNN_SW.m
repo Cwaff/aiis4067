@@ -1,7 +1,7 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 5);
 %[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
 
 %trainImages = cat(1,pedestrianTrainImages,pedestrianTestImages);
@@ -86,50 +86,71 @@ trainingTime = toc;
 numTestImages = size(pedestrianTestImages)
 numTestImages = size(pedestrianTestImages,1)
 %}
-frame = imread('pedestrian/image_00000786.jpg');
-testImage = rgb2gray(frame);
 
-%testImage = reshape(testImage,1, size(testImage, 1) * size(testImage, 2));
-testImage = double(testImage);
+imgPath = 'pedestrian/';
+imgType = '*.jpg'; % change based on image type
+images  = dir([imgPath imgType]);
+figure
+for idx = 1:length(images)
+    Images{idx} = imread([imgPath images(idx).name]);
+    buffer(:,:,:,idx) = Images{idx};
+end
+
+%frame = imread('pedestrian/image_00000429.jpg');
+
 
 im_width = 640;
 im_height = 480;
 
-sw_width = [96];
-sw_height = [160];
-sw_increment = [2];
+widths = [144,96,48];
+heights = [240,160,80];
 
 heightcount = 0;
 widthcount = 0;
 
-size(testImage)
+finalVideo = VideoWriter('resultTracking');
+open(finalVideo);
+for m=1:length(images)
 
+    testImage = rgb2gray(buffer(:,:,:,m));
+    testImage = double(testImage);
+    
 predictions = [];
 boxes = [];
 confidences = [];
 b_conf = [];
-imshow(frame) 
+imshow(buffer(:,:,:,m)) 
 count = 0;
 boxcount = 0;
 hold on
-for i = 1:sw_height/sw_increment:size(testImage,1)
-    for j = 1:sw_width/sw_increment:size(testImage,2)
-        
-        if (i+sw_height-1 <= size(testImage,1)) && (j+sw_width-1 <= size(testImage,2))
-           count = count+1; 
-            crop = testImage(i:i+sw_height-1, j:j+sw_width-1); 
-           % digitIm = reshape(digitIm,1,sw_width*sw_height);
-            digitIm = imresize(crop,[160 96]);
-             hogFeatures = hog_feature_vector(digitIm);
-            [predictions(count, 1), confidences(count,1)] = SVMTesting_v2(hogFeatures, model);
-            
-            if (predictions(count, 1) == 1)
-                confidences(count,1)
-                boxcount = boxcount+1;
-                boxes(boxcount,:) = [j i sw_width sw_height confidences(count,1)]; 
-                %rectangle('Position', [j i sw_width sw_height]);
-                %b_conf(boxcount,1) = confidences(count,1);
-                %set(boxes, 'EdgeColor','r','LineWidth',1);
+for b = 1:3
+    
+    sw_width = widths(b);
+    sw_height = heights(b);
+    sw_increment = 4;
+    stepX = round(sw_width/sw_increment);
+    stepY = round(sw_height/sw_increment);
+    
+    for i = 1:stepY:size(testImage,1)
+        for j = 1:stepX:size(testImage,2)
+
+            if (i+sw_height-1 <= size(testImage,1)) && (j+sw_width-1 <= size(testImage,2))
+               count = count+1; 
+                crop = testImage(i:i+sw_height-1, j:j+sw_width-1); 
+               % digitIm = reshape(digitIm,1,sw_width*sw_height);
+                digitIm = imresize(crop,[160 96]);
+                 hogFeatures = hog_feature_vector(digitIm);
+                [predictions(count, 1), confidences(count,1)] = SVMTesting_v2(hogFeatures, model);
+
+                if (predictions(count, 1) == 1)
+                    if(confidences(count,1) > 1)
+                        boxcount = boxcount+1;
+                        boxes(boxcount,:) = [j i sw_width sw_height confidences(count,1)]; 
+                        %rectangle('Position', [j i sw_width sw_height]);
+                        %b_conf(boxcount,1) = confidences(count,1);
+                        %set(boxes, 'EdgeColor','r','LineWidth',1);
+                    end
+                end
             end
         end
     end
@@ -143,6 +164,22 @@ for b = 1:size(newboxes,1)
     set(h, 'EdgeColor','r','LineWidth',1);
 end
 hold off 
+
+f = getframe(gca);
+writeVideo(finalVideo, f);
+%buffer(:,:,:,m) = frame2im(f);
+end
+close(finalVideo);
+%{
+figure
+for n = 1:5%length(images)
+    imshow(buffer(:,:,:,n)), title('PLAYBACK')
+    
+    pause(1)
+end
+%}
+
+
 %predictions = cat(1,predictions,predictionRow);
 %}
     %{
@@ -186,36 +223,4 @@ falseAlarm = 1 - specificity
 f1 = (2*tp)/((2*tp) + fn + fp)
 trainingTime
 testingTime
-%}
-% %Load pedestrian db 
-% %[testimages, testlabels] = loadPedestrianDatabase('pedestrian_train.cdataset');
-% 
-% %Calculate all Hogs for test images 
-% %hogMatrix = calcAllHogs(trainImages);
-% 
-% %DisplayHog
-% % for i = 1 :numTrainImages
-% %    showHog(hogMatrix(i, :), [160, 96]);
-% % end
-% 
-% 
-% %Create training model 
-% svmModel = SVMTraining(hogMatrix, testlabels);
-% 
-% %Load Pedestrian Testing dataset 
-% [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
-% 
-% %Set test array size
-% numTestImages = size(pedestrianTestImages, 1);
-% 
-% 
-% for i = 1 :numTestImages
-%     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
-%     hogMatrix(i, :) = hog_feature_vector(featureImage);
-%     [prediction(i, 1) maxi] = SVMTesting(hogFeatures, model);
-% end
-% 
-% comparison = (pedestrianTestLabels == prediction);
-% 
-% accuracy = sum(comparison)/length(comparison);
 %}
