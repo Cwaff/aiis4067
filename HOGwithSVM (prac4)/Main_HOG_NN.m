@@ -1,8 +1,8 @@
-clear all; 
+%clear all; 
 close all;
-
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 20);
 %{
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
+
 %showHog rsize = [160,96] !!!!
 
 %Declare variables for storing image locations
@@ -51,7 +51,7 @@ end
 %Concatenate positive and negatives into 1 array 
 pedestrianTrainImages = cat(1,pedestrianTrainImages,pedestrianTrainImagesneg);
 pedestrianTrainLabels = cat(1,pedestrianTrainLabels,pedestrianTrainLabelsneg);
-%}
+
 %Write previous arrays to new training arrays 
 trainImages = pedestrianTrainImages;
 trainLabels = pedestrianTrainLabels;
@@ -75,7 +75,7 @@ model = NNtraining(hogFeatures,trainLabels);
 trainingTime = toc;
 
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
-
+%}
 numTestImages = size(pedestrianTestImages)
 numTestImages = size(pedestrianTestImages,1)
 tic

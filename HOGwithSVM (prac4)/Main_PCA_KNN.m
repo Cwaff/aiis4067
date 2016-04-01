@@ -1,7 +1,7 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 20);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
 %{
 %showHog rsize = [160,96] !!!!
 
@@ -87,7 +87,7 @@ tic
 for i = 1 :numTestImages
     testnumber= pedestrianTestImages(i, :);
     test_xpca = (testnumber - meanX) * eigenVectors;
-    [prediction(i, 1)] = KNNTesting(test_xpca, model,1);
+    [prediction(i, 1)] = KNNTesting(test_xpca, model,10);
 end
 testingTime = toc;
 

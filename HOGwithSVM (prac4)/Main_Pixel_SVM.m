@@ -71,7 +71,7 @@ showHog(hogFeatures(i, :), [160, 96]);
 %}
 %model = SVMtraining_1(hogFeatures, trainLabels);
 tic
-model = SVMtraining_1(trainImages,trainLabels);
+model = SVMTraining(trainImages,trainLabels);
 trainingTime = toc;
 
 
@@ -84,7 +84,7 @@ tic
 for i = 1 :numTestImages
     testnumber= pedestrianTestImages(i, :);
     %test_xpca = (testnumber - meanX) * eigenVectors;
-    [prediction(i, 1)] = SVMTesting(testnumber, model);
+    [prediction(i, 1)] = SVMTesting_v2(testnumber, model);
 end
 testingTime = toc;
 

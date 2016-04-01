@@ -1,7 +1,12 @@
-%clear all; 
+clear all; 
 close all;
 
 [pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
+%[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
+
+%trainImages = cat(1,pedestrianTrainImages,pedestrianTestImages);
+%trainLabels = cat(1,pedestrianTrainLabels,pedestrianTestLabels);
+%}
 %{
 %showHog rsize = [160,96] !!!!
 
@@ -56,6 +61,7 @@ pedestrianTrainLabels = cat(1,pedestrianTrainLabels,pedestrianTrainLabelsneg);
 trainImages = pedestrianTrainImages;
 trainLabels = pedestrianTrainLabels;
 
+
 %Set training array size
 numTrainImages = size(trainImages, 1);
 
@@ -70,38 +76,117 @@ end
 showHog(hogFeatures(i, :), [160, 96]);
 
 %model = SVMtraining_1(hogFeatures, trainLabels);
-model = NNtraining(trainImages,trainLabels);
+tic
+model = SVMTraining(hogFeatures,trainLabels);
+trainingTime = toc;
 
+%{
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
-
-%Guys code for running the thing 
-%% Detection 
-tSize = [24, 32];
-testImPath = './pedestrian/';
-imlist = dir([testImPath '*.jpg']);
-for j = 1:length(imlist)
-    img = imread([testImPath imlist(j).name]);
-    axis equal; axis tight; axis off;
-    imshow(img); hold on;
-    detect(img,model,tSize);
-%     saveas(gcf, ['./results/' imlist(j).name], 'jpg');
-    close all;
-end
 
 numTestImages = size(pedestrianTestImages)
 numTestImages = size(pedestrianTestImages,1)
+%}
+frame = imread('pedestrian/image_00000786.jpg');
+testImage = rgb2gray(frame);
 
+%testImage = reshape(testImage,1, size(testImage, 1) * size(testImage, 2));
+testImage = double(testImage);
+
+im_width = 640;
+im_height = 480;
+
+sw_width = [96];
+sw_height = [160];
+sw_increment = [2];
+
+heightcount = 0;
+widthcount = 0;
+
+size(testImage)
+
+predictions = [];
+boxes = [];
+confidences = [];
+b_conf = [];
+imshow(frame) 
+count = 0;
+boxcount = 0;
+hold on
+for i = 1:sw_height/sw_increment:size(testImage,1)
+    for j = 1:sw_width/sw_increment:size(testImage,2)
+        
+        if (i+sw_height-1 <= size(testImage,1)) && (j+sw_width-1 <= size(testImage,2))
+           count = count+1; 
+            crop = testImage(i:i+sw_height-1, j:j+sw_width-1); 
+           % digitIm = reshape(digitIm,1,sw_width*sw_height);
+            digitIm = imresize(crop,[160 96]);
+             hogFeatures = hog_feature_vector(digitIm);
+            [predictions(count, 1), confidences(count,1)] = SVMTesting_v2(hogFeatures, model);
+            
+            if (predictions(count, 1) == 1)
+                confidences(count,1)
+                boxcount = boxcount+1;
+                boxes(boxcount,:) = [j i sw_width sw_height confidences(count,1)]; 
+                %rectangle('Position', [j i sw_width sw_height]);
+                %b_conf(boxcount,1) = confidences(count,1);
+                %set(boxes, 'EdgeColor','r','LineWidth',1);
+            end
+        end
+    end
+end
+
+%newboxes=boxes;
+newboxes = simpleNMS(boxes,.1);
+
+for b = 1:size(newboxes,1)
+    h = rectangle('Position', newboxes(b,1:4));
+    set(h, 'EdgeColor','r','LineWidth',1);
+end
+hold off 
+%predictions = cat(1,predictions,predictionRow);
+%}
+    %{
+tic
 for i = 1 :numTestImages
     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
     hogFeatures(i, :) = hog_feature_vector(featureImage);
-    %[prediction(i, 1), maxi] = SVMTesting(hogFeatures(i,:), model);
-    [prediction(i, 1)] = NNTesting(pedestrianTestImages(i, :), model);
+    [prediction(i, 1)] = KNNTesting(hogFeatures(i,:), model,3);
+    %[prediction(i, 1)] = NNTesting(pedestrianTestImages(i, :), model);
 end
+testingTime = toc;
+%}
 
+
+%{
 comparison = (pedestrianTestLabels == prediction)
 
 accuracy = sum(comparison)/length(comparison)
 
+tp=0;
+tn=0;
+fp=0;
+fn=0;
+for i=1:numTestImages
+    if(and(prediction(i,1) == 1,pedestrianTestLabels(i,1) == 1))
+        tp = tp +1;
+    elseif(and(prediction(i,1) == 1,pedestrianTestLabels(i,1) == -1))
+        fp = fp+1;
+    elseif(and(prediction(i,1) == -1,pedestrianTestLabels(i,1) == -1))
+        tn = tn+1;
+    else
+        fn = fn+1;
+    end
+end
+
+errorRate = (fn+fp)/numTestImages
+sensitivity = tp/(tp+fn)
+precision = tp/(tp+fp)
+specificity = tn/(tn +fp)
+falseAlarm = 1 - specificity
+f1 = (2*tp)/((2*tp) + fn + fp)
+trainingTime
+testingTime
+%}
 % %Load pedestrian db 
 % %[testimages, testlabels] = loadPedestrianDatabase('pedestrian_train.cdataset');
 % 

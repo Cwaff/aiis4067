@@ -1,7 +1,7 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 5);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
 %{
 %showHog rsize = [160,96] !!!!
 
@@ -88,6 +88,7 @@ for i = 1 :numTestImages
     [prediction(i, 1)] = NNTesting(test_xpca, model);
 end
 testingTime = toc;
+testingDONE = 1
 
 comparison = (pedestrianTestLabels == prediction);
 

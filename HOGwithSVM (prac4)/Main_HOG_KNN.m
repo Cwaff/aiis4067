@@ -1,7 +1,7 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 20);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 1);
 %{
 %showHog rsize = [160,96] !!!!
 
@@ -73,7 +73,7 @@ showHog(hogFeatures(i, :), [160, 96]);
 tic
 model = NNtraining(hogFeatures,trainLabels);
 trainingTime = toc;
-[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
+[pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 1);
 
 numTestImages = size(pedestrianTestImages)
 numTestImages = size(pedestrianTestImages,1)
@@ -81,7 +81,7 @@ tic
 for i = 1 :numTestImages
     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
     hogFeatures(i, :) = hog_feature_vector(featureImage);
-    [prediction(i, 1)] = KNNTesting(hogFeatures(i,:), model,10);
+    [prediction(i, 1)] = KNNTesting(hogFeatures(i,:), model,3);
     %[prediction(i, 1)] = NNTesting(pedestrianTestImages(i, :), model);
 end
 testingTime = toc;

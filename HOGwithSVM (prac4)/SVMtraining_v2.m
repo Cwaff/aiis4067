@@ -23,10 +23,10 @@ if max(labels)<2
     model.param.sigmakernel=sigmakernel;
     model.param.kernel=kernel;
    
-    T=templateSVM('Standardize',1,'Boxconstraint',C) ;
     classifier = fitcecoc(images,labels,'Learners', T);
     
     model.classifier = classifier;
+    
     model.type='binary';
     
 else

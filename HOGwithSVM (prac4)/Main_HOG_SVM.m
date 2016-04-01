@@ -2,7 +2,7 @@ clear all;
 close all;
 
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 20);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
 %{
 %showHog rsize = [160,96] !!!!
 
@@ -70,7 +70,7 @@ end
 
 showHog(hogFeatures(i, :), [160, 96]);
 tic
-model = SVMtraining_1(hogFeatures, trainLabels);
+model = SVMTraining(hogFeatures, trainLabels);
 trainingTime = toc;
 %model = NNtraining(trainImages,trainLabels);
 
@@ -82,7 +82,7 @@ tic
 for i = 1 :numTestImages
     featureImage = reshape(pedestrianTestImages(i, :), [160, 96]);
     hogFeatures(i, :) = hog_feature_vector(featureImage);
-    [prediction(i, 1), maxi] = SVMTesting(hogFeatures(i,:), model);
+    [prediction(i, 1), maxi] = SVMTesting_v2(hogFeatures(i,:), model);
     %[prediction(i, 1)] = NNTesting(pedestrianTestImages(i, :), model);
 end
 testingTime = toc;

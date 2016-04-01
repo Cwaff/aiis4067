@@ -17,7 +17,7 @@ yStep = 60;
 
 [bottomRightCol, bottomRightRow, d] = size(im);
 
-fcount = 1;
+fcount = 0;
 
 % this for loop scan the entire image and extract features for each sliding window
 for y = topLeftCol:yStep:bottomRightCol-wSize(2)   

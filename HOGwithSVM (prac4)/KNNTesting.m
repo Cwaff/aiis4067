@@ -1,5 +1,5 @@
 function prediction = KNNTesting(testImage, modelNN, K)
-    minValues = zeros(K,1)+1000;
+    minValues = zeros(K,1)+10000;
     minIndexes = ones(K,1);
     for i=1:size(modelNN.neighbours,1)
        dEuc = EuclideanDistance(testImage,modelNN.neighbours(i,:)); 

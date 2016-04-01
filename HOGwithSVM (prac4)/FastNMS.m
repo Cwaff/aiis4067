@@ -14,10 +14,10 @@ if isempty(boxes)
   return;
 end
 
-x1 = boxes(:,1);
-y1 = boxes(:,2);
-x2 = boxes(:,3);
-y2 = boxes(:,4);
+x1 = boxes(1,:);
+y1 = boxes(2,:);
+x2 = boxes(3,:);
+y2 = boxes(4,:);
 s = boxes(:,end);
 
 area = (x2-x1+1) .* (y2-y1+1);

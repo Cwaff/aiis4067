@@ -85,7 +85,7 @@ tic
 for i = 1 :numTestImages
     testnumber= pedestrianTestImages(i, :);
     %test_xpca = (testnumber - meanX) * eigenVectors;
-    [prediction(i, 1)] = KNNTesting(testnumber, model,1);
+    [prediction(i, 1)] = KNNTesting(testnumber, model,10);
 end
 testingTime = toc;
 

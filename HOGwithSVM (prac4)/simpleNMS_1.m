@@ -1,5 +1,5 @@
 
-function objectsOP = simpleNMS(objects,threshold)
+function objectsOP = simpleNMS_1(objects,threshold)
 
 if isempty(objects)
   objectsOP = objects;

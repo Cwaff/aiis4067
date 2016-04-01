@@ -1,7 +1,7 @@
 clear all; 
 close all;
 
-[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 5);
+[pedestrianTrainImages, pedestrianTrainLabels] = loadPedestrianDatabase('pedestrian_train.cdataset', 10);
 %{
 %showHog rsize = [160,96] !!!!
 
@@ -74,7 +74,7 @@ showHog(hogFeatures(i, :), [160, 96]);
 
 [eigenVectors,eigenvalues,meanX,x_pca] = PrincipalComponentAnalysis(trainImages);
 tic
-model = SVMtraining_1(x_pca,trainLabels);
+model = SVMTraining(x_pca,trainLabels);
 trainingTime = toc;
 
 [pedestrianTestImages, pedestrianTestLabels] = loadPedestrianDatabase('pedestrian_test.cdataset', 10);
@@ -86,7 +86,7 @@ tic
 for i = 1 :numTestImages
     testnumber= pedestrianTestImages(i, :);
     test_xpca = (testnumber - meanX) * eigenVectors;
-    [prediction(i, 1)] = SVMTesting(test_xpca, model);
+    [prediction(i, 1)] = SVMTesting_v2(test_xpca, model);
 end
 testingTime = toc;
 
